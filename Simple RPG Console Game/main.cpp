@@ -39,7 +39,7 @@ void PlayGame()
     bool gameOver = false;
     do
     {
-     // --- ENEMY CREATION (new enemy each enounter) ---
+        // --- ENEMY CREATION (new enemy each enounter) ---
         eWeapon = 0 + (rand() % 3); //random number 0-3
         eArmor = 0 + (rand() % 3); //random number 0-3
         theEnemy = new Enemy(eWeapon, eArmor);
@@ -47,7 +47,7 @@ void PlayGame()
         Encounter(thePlayer, theEnemy, gameOver); // encounter start
 
         delete theEnemy; // delete in prep for next enemy
-    } while (gameOver == false);
+    } while (!gameOver);
 
     cout << "Game over!";
 
@@ -99,40 +99,39 @@ void Encounter(Player* player, Enemy* enemy, bool &gameOver)
         Round(player, enemy);
     } while (player->IsAlive() && enemy->IsAlive());
 
+
     // someone has died at this point
     // figure out who
-    if (!enemy->IsAlive() && player->IsAlive()) // enemy died
+    if (!enemy->IsAlive() && !player->IsAlive()) // both died
+    {
+        cout << "You have tied!" << endl;
+        gameOver = true;
+    }
+    else if (!player->IsAlive()) // player died
+    {
+        cout << "You have died!" << endl;
+        gameOver = true;
+    }
+    else // enemy died
     {
         cout << "The enemy has died!" << endl << endl;
 
         // REST OR NO?
         cout << "Rest and resume against a new enemy (y/n)?: ";
         cin >> resumeChoice;
-        if (resumeChoice == 'y')
-        {
-            player->Rest();
-            cout << "Resting has healed you for 20 health! You now have " << player->getCurrentHealth() << " health" << endl << endl;
-
-            //gameOver = false;
-        }
-        else if (resumeChoice == 'n')
+        if (resumeChoice == 'n')
         {
             cout << "You win!" << endl;
             gameOver = true;
         }
+        else if (resumeChoice == 'y')
+        {
+            player->Rest();
+            cout << "Resting has healed you for 20 health! You now have " << player->getCurrentHealth() << " health" << endl << endl;
 
+            // gameOver = false;
+        }
     }
-    else if (!enemy->IsAlive() && !player->IsAlive()) // both died
-    {
-        cout << "You have tied!" << endl;
-        gameOver = true;
-    }
-    else // player died
-    {
-        cout << "You have died!" << endl;
-        gameOver = true;
-    }
-
 }
 
 void Round(Player* player, Enemy* enemy)
