@@ -1,4 +1,5 @@
 #include "Player.h"
+#include <iostream>
 #include <algorithm>
 
 Player::Player(std::string name, int weapon, int armor) :

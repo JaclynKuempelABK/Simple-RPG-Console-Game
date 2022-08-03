@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Enemy.h"
+#include <iostream>
 
 using std::string;
 using std::cout;
@@ -11,9 +12,13 @@ void PlayGame();
 
 void PlayerCreationMenu(string& nameChoice, int& weaponChoice, int& armorChoice);
 
-void Encounter(Player* player, Enemy* enemy, bool &gameOver);
+void Encounter(Player* player, Enemy* enemy);
 
 void Round(Player* player, Enemy* enemy);
+
+bool CheckGameOver(Player* player, Enemy* enemy);
+
+bool DoResume()
 
 int main()
 {
@@ -33,10 +38,10 @@ void PlayGame()
     PlayerCreationMenu(pName, pWeapon, pArmor); // gather player preferences
     Player* thePlayer = new Player(pName, pWeapon, pArmor);
 
-// --- ENCOUNTER AGAINST ENEMY ---
+// --- ENCOUNTERS AGAINST ENEMIES ---
     Enemy* theEnemy = nullptr;
     int eWeapon, eArmor = 0;
-    bool gameOver = false;
+    bool isGameOver = false;
     do
     {
         // --- ENEMY CREATION (new enemy each enounter) ---
@@ -44,10 +49,11 @@ void PlayGame()
         eArmor = 0 + (rand() % 3); //random number 0-3
         theEnemy = new Enemy(eWeapon, eArmor);
 
-        Encounter(thePlayer, theEnemy, gameOver); // encounter start
+        Encounter(thePlayer, theEnemy); // encounter start
+        isGameOver = CheckGameOver(thePlayer, theEnemy);
 
-        delete theEnemy; // delete in prep for next enemy
-    } while (!gameOver);
+        delete theEnemy; // delete in prep for next enemy/end of game
+    } while (!isGameOver);
 
     cout << "Game over!";
 
@@ -88,50 +94,13 @@ void PlayerCreationMenu(string& pName, int& pWeapon, int& pArmor)
     system("CLS");
 }
 
-void Encounter(Player* player, Enemy* enemy, bool &gameOver)
+void Encounter(Player* player, Enemy* enemy)
 {
-    int eWeapon, eArmor = 0;
-    char resumeChoice = 'y';
-
     cout << "Encounter begins!" << endl << endl;
     do
     {
         Round(player, enemy);
     } while (player->IsAlive() && enemy->IsAlive());
-
-
-    // someone has died at this point
-    // figure out who
-    if (!enemy->IsAlive() && !player->IsAlive()) // both died
-    {
-        cout << "You have tied!" << endl;
-        gameOver = true;
-    }
-    else if (!player->IsAlive()) // player died
-    {
-        cout << "You have died!" << endl;
-        gameOver = true;
-    }
-    else // enemy died
-    {
-        cout << "The enemy has died!" << endl << endl;
-
-        // REST OR NO?
-        cout << "Rest and resume against a new enemy (y/n)?: ";
-        cin >> resumeChoice;
-        if (resumeChoice == 'n')
-        {
-            cout << "You win!" << endl;
-            gameOver = true;
-        }
-        else if (resumeChoice == 'y')
-        {
-            player->Rest();
-            cout << "Resting has healed you for 20 health! You now have " << player->getCurrentHealth() << " health" << endl << endl;
-
-            // gameOver = false;
-        }
-    }
 }
 
 void Round(Player* player, Enemy* enemy)
@@ -149,4 +118,52 @@ void Round(Player* player, Enemy* enemy)
     // output current health for player & enemy
     cout << "Your health: " << player->getCurrentHealth() << endl;
     cout << "Enemy's health: " << enemy->getCurrentHealth() << endl << endl;
+}
+
+bool CheckGameOver(Player* player, Enemy* enemy)
+{
+    
+
+    // someone has died at this point
+    // figure out who
+    if (!enemy->IsAlive() && !player->IsAlive()) // both died
+    {
+        cout << "You have tied!" << endl;
+        return true;
+    }
+    else if (!player->IsAlive()) // player died
+    {
+        cout << "You have died!" << endl;
+        return true;
+    }
+    else // enemy died
+    {
+        cout << "The enemy has died!" << endl << endl;
+
+        if (!DoResume())
+        {
+            cout << "You win!" << endl;
+            return true;
+        }
+        else
+        {
+            player->Rest();
+            cout << "Resting has healed you for 20 health! You now have " << player->getCurrentHealth() << " health" << endl << endl;
+            return false;
+        }
+    }
+}
+
+bool DoResume()
+{
+    char resumeChoice = 'y';
+
+    // REST OR NO?
+    cout << "Rest and resume against a new enemy (y/n)?: ";
+    cin >> resumeChoice;
+
+    if (resumeChoice == 'y')
+        return true;
+    else
+        return false;
 }

@@ -1,13 +1,16 @@
 #pragma once
-#include <string>
+#include "Item.h"
 
-class Armor
+class Armor :
+	public Item
 {
 protected:
-	std::string m_type;
 	int m_maxHealthMod;
-	int m_dodgeMod;
+	float m_dodgeMod;
 
 public:
+	Armor();
+
+	Armor(std::string name);
 };
 

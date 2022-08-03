@@ -1,14 +1,19 @@
 #pragma once
-#include <string>
+#include "Item.h"
 
-class Weapon
+class Weapon :
+	public Item
 {
 protected:
-	std::string m_name;
 	int m_minDmg;
 	int m_maxDmg;
 
 public:
+	Weapon();
+
+	Weapon(std::string name);
+
+	virtual ItemType GetType() override { return ItemType::Weapon;  }
 
 };
 

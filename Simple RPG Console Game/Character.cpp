@@ -1,5 +1,4 @@
 #include "Character.h"
-#include <iostream>
 #include <algorithm>
 
 Character::Character(int weapon, int armor)
